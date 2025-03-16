@@ -1,7 +1,3 @@
-<<<<<<< HEAD
-# claude_minis
-Experiments with Claude Code: few-shot projects or "minis"
-=======
 # Space Shooter
 
 A simple space shooter game built with Pygame.
@@ -83,4 +79,3 @@ To update the requirements file after adding new dependencies:
 ```bash
 pip freeze > requirements.txt
 ```
->>>>>>> b41b65e (CCE-01 space_shooter game)
