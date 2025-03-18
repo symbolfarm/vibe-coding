@@ -166,6 +166,7 @@ class Tetromino:
     def hard_drop(self, board):
         while self.move(0, 1, board):
             pass
+        return True  # Indicates the piece can't move down anymore and should be locked
 
 class Game:
     def __init__(self):
@@ -406,7 +407,17 @@ def main():
                     elif event.key == K_UP:
                         game.current_piece.rotate(game.board)
                     elif event.key == K_SPACE:
-                        speedup = HARD_DROP_FACTOR
+                        # Hard drop the current piece
+                        game.current_piece.hard_drop(game.board)
+                        # Lock the piece in place
+                        game.board = game.current_piece.lock(game.board)
+                        # Check for completed lines
+                        game.check_lines()
+                        # Create a new piece
+                        game.current_piece = game.new_piece()
+                        # Check for game over (if new piece collides immediately)
+                        if game.current_piece.collision(game.board):
+                            game.game_over = True
                     elif event.key == K_p:
                         game.paused = not game.paused
                     elif event.key == K_ESCAPE:
@@ -419,7 +430,7 @@ def main():
             
             # Handle key releases
             elif event.type == KEYUP:
-                if event.key == K_DOWN or event.key == K_SPACE:
+                if event.key == K_DOWN:
                     speedup = 1
         
         # Update game state
