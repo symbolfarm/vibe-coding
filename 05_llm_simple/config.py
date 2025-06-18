@@ -1,5 +1,5 @@
 import torch
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Literal
 
 @dataclass
@@ -42,7 +42,7 @@ class TrainingConfig:
 
 @dataclass
 class Config:
-    model: ModelConfig = ModelConfig()
-    training: TrainingConfig = TrainingConfig()
+    model: ModelConfig = field(default_factory=ModelConfig)
+    training: TrainingConfig = field(default_factory=TrainingConfig)
     device: str = "cuda" if torch.cuda.is_available() else "cpu"
     seed: int = 42
