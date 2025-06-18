@@ -1,12 +1,15 @@
 import torch
 import torch.nn as nn
 import torch.optim as optim
-from torch.cuda.amp import GradScaler, autocast
+from torch.amp import GradScaler, autocast
 import os
 import time
 import json
 from datetime import datetime
 from typing import Optional
+
+# Set tokenizers parallelism to avoid fork warning
+os.environ["TOKENIZERS_PARALLELISM"] = "false"
 
 from config import Config
 from model import create_model
@@ -50,7 +53,7 @@ class Trainer:
         )
         
         # Mixed precision scaler
-        self.scaler = GradScaler() if config.training.use_amp else None
+        self.scaler = GradScaler('cuda') if config.training.use_amp else None
         
         # Training state
         self.step = 0
@@ -73,7 +76,7 @@ class Trainer:
         self.optimizer.zero_grad()
         
         if self.scaler:
-            with autocast():
+            with autocast('cuda'):
                 logits, loss = self.model(x, y)
             self.scaler.scale(loss).backward()
             self.scaler.unscale_(self.optimizer)
@@ -109,7 +112,7 @@ class Trainer:
             x, y = x.to(self.device), y.to(self.device)
             
             if self.scaler:
-                with autocast():
+                with autocast('cuda'):
                     logits, loss = self.model(x, y)
             else:
                 logits, loss = self.model(x, y)
@@ -163,7 +166,7 @@ class Trainer:
             print(f"Checkpoint not found: {checkpoint_path}")
             return
         
-        checkpoint = torch.load(checkpoint_path, map_location=self.device)
+        checkpoint = torch.load(checkpoint_path, map_location=self.device, weights_only=False)
         
         self.model.load_state_dict(checkpoint['model_state_dict'])
         self.optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
