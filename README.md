@@ -1,2 +1,2 @@
-# claude_minis
-Experiments with Claude Code: few-shot projects or "minis"
+# vibe-coding
+Experiments with AI coding assistants and agents: small few-shot code projects
